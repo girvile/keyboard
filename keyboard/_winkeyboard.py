@@ -499,7 +499,10 @@ numeric_keys = [
     ("right", 0xE04D, 0x27),
     ("home", 0xE047, 0x24),
     ("up", 0xE048, 0x26),
-    ("page up", 0xE049, 0x21)
+    ("page up", 0xE049, 0x21),
+    (".", 0x53, 0xBE),
+    ("decimal", 0x53, 0x6E),
+    ("delete", 0x53, 0x2E)
 ]
 ctrl_is_pressed = False
 shift_is_pressed = False
@@ -590,7 +593,7 @@ def map_name(name):
     _setup_name_tables()
     number_key = next(filter(lambda k: k[0] == name, numeric_keys), None)
     if number_key is not None:
-        yield number_key[1] or -number_key[2], ()
+        yield -number_key[2], ()
         return
     entries = from_name.get(name)
     if not entries:
@@ -599,7 +602,7 @@ def map_name(name):
         scan_code, vk, is_extended, modifiers = entry
         number_key = next(filter(lambda k: k[1] == scan_code + (is_extended * 0xE000), numeric_keys), None)
         if number_key is not None:
-            yield number_key[1] or -number_key[2], ()
+            yield -number_key[2], ()
             return
         yield scan_code or -vk, modifiers
 
@@ -615,7 +618,6 @@ def _send_event(code, event_type):
             vk = num_vk[2]
         if code == 0x1D and vk == 0xA2:
             ctrl_is_pressed = True if event_type == 0 else False
-        print('event_type: ', event_type)
         user32.keybd_event(vk, code, event_type, 0)
         if code == 0xE038:
             if event_type == 0:
