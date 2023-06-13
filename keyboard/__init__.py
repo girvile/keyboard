@@ -356,7 +356,6 @@ class _KeyboardListener(_GenericListener):
 
         event_type = event.event_type
         scan_code = event.scan_code
-
         # Update tables of currently pressed keys and modifiers.
         with _pressed_events_lock:
             if event_type == KEY_DOWN:
@@ -423,7 +422,6 @@ def key_to_scan_codes(key, error_if_missing=True):
         return sum((key_to_scan_codes(i) for i in key), ())
     elif not _is_str(key):
         raise ValueError('Unexpected key type ' + str(type(key)) + ', value (' + repr(key) + ')')
-
     normalized = normalize_name(key)
     if normalized in sided_modifiers:
         left_scan_codes = key_to_scan_codes('left ' + normalized, False)
@@ -493,7 +491,6 @@ def send(hotkey, do_press=True, do_release=True):
     Note: keys are released in the opposite order they were pressed.
     """
     _listener.is_replaying = True
-
     parsed = parse_hotkey(hotkey)
     for step in parsed:
         if do_press:
