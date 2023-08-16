@@ -504,6 +504,7 @@ numeric_keys = [
     ("decimal", 0x53, 0x6E),
     ("delete", 0x53, 0x2E)
 ]
+numeric_keys_value = list(map(lambda x: x[1], numeric_keys))
 ctrl_is_pressed = False
 shift_is_pressed = False
 altgr_is_pressed = False
@@ -589,20 +590,40 @@ def listen(callback):
         TranslateMessage(msg)
         DispatchMessage(msg)
 
+def key_numeric_name(name):
+    number_key = None
+    for k in numeric_keys:
+        if k[0] == name:
+                number_key = k
+    return number_key
+
+def key_numeric_value(scancode, is_extended):
+    to_compare = scancode + (is_extended * 0xE000)
+    if to_compare in numeric_keys_value:
+        for k in numeric_keys:
+            if k[1] == to_compare:
+                return k
+    return None
+
+table_setup = False
+
 def map_name(name):
-    _setup_name_tables()
-    number_key = next(filter(lambda k: k[0] == name, numeric_keys), None)
+    global table_setup
+    if table_setup == False:
+        _setup_name_tables()
+        table_setup = True
+    number_key = key_numeric_name(name)
     if number_key is not None:
-        yield -number_key[2], ()
+        yield number_key[1] or -number_key[2], ()
         return
     entries = from_name.get(name)
     if not entries:
         raise ValueError('Key name {} is not mapped to any known key.'.format(repr(name)))
     for i, entry in entries:
         scan_code, vk, is_extended, modifiers = entry
-        number_key = next(filter(lambda k: k[1] == scan_code + (is_extended * 0xE000), numeric_keys), None)
+        number_key = key_numeric_value(scan_code, is_extended)
         if number_key is not None:
-            yield -number_key[2], ()
+            yield number_key[1] or -number_key[2], ()
             return
         yield scan_code or -vk, modifiers
 
