@@ -1,4 +1,4 @@
-**This project is currently unmaintained. It works for many cases, and I wish to pick it up again in the future, but you might encounter some friction and limited features using it.**
+**I made this to handle AZERY, QWERTY, and special characters on windows **
 
 ---
 
